@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ES6 Promises</title>
+    <style>
+    
+        input:invalid {
+            border: 1px dashed red;
+        }
+
+        input,
+        input:valid {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<div id="image-holder"></div>
+<script>
+  var img= null;
+  var height = null;
+  var width = null;
+  var doGrayScale = false;
+  
+  let imgPromise = new Promise(function(resolve, reject){
+    fullQs = window.location.search.substring(1); 
+    qsParamsArray = fullQs.split("&");  
+    
+    //Loop through each name-value pair and   
+    //return value in there is a match for the given key  
+    for (i=0;i<qsParamsArray.length;i++) {  
+        strKey = qsParamsArray[i].split("="); 
+       
+        if( strKey[0] == "width")
+           width = strKey[1];
+        if( strKey[0] == "height")
+           height = strKey[1];
+        if( strKey[0] == "grayscale")
+        {
+           if (strKey[1] == "on")
+               doGrayScale = true;
+        }
+    
+    }  
+    img = new Image();
+    var url = "https://picsum.photos/";
+    var urlgray = "https://picsum.photos/g/";
+    var fullurl = "";
+    img.addEventListener('load', resolve(img));
+    img.addEventListener('error', reject('Could not load image'));
+      
+    if (doGrayScale)
+       fullurl = urlgray;
+    else
+        fullurl = url;
+    
+    if ( width != null)
+        fullurl += width + "/";
+    else
+        fullurl += "200/";
+    if ( height != null )
+        fullurl += height + "/";
+    else
+        fullurl += "300/";
+    if (!doGrayScale)
+        fullurl += "?random";
+      
+      //img.src = "https://picsum.photos/200/300/?random";
+      img.src = fullurl;
+  });
+
+    imgPromise.then(function(fromResolve){
+        console.log('The image has loaded. Yay!');
+        let node = document.getElementById('image-holder');
+        node.appendChild(img);
+        }).catch(function(fromReject){
+            console.log(fromReject);
+        })
+
+       
+</script>
+<form id="pixelForm">
+    <h4>ES6 Promises Viewer</h4>
+    <label for="width">Width</label>
+    <input id="pixelwidth" name="width"  placeholder="Enter a width in pixels" id="width"
+           pattern="[0-9]+" title="Only numbers allowed" maxlength="3"  />
+    <label for="height">Height</label>
+    <input id="pixelheight" name="height" placeholder="Enter a height in pixels" id="height"
+           pattern="[0-9]+" title="Only numbers allowed" maxlength="3"  /><br/>
+    <label for="grayscale">Use Grayscale</label>
+    <input id="grayscale" name="grayscale" type="checkbox"><br/><br/>
+    <div class="dimensions">
+        <input type="submit"  />
+    </div>
+</form>
+</html> 
